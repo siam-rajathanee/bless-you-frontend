@@ -1,13 +1,9 @@
 export default {
-  server: {
-    host: process.env.HOST || '0.0.0.0',
-    port: process.env.PORT || 8080
-  },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'bless-you-frontend',
+    title: 'อนุโมทนา สาธุ',
     htmlAttrs: {
-      lang: 'en'
+      lang: 'th'
     },
     meta: [
       { charset: 'utf-8' },
