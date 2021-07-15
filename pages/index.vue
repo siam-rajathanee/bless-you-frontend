@@ -183,17 +183,17 @@ export default {
     async onSubmit () {
       try {
         await this.createDonation({
-          file: this.file,
+          proof_of_transfer: this.file,
           firstname: this.firstname,
           lastname: this.lastname,
           donate: this.donate === 'OTHER' ? this.donateOther : this.donate,
           address: this.address,
           amount: this.amount,
-          zipCode: this.zipCode,
-          subDistrict: this.subDistrict,
+          zip_code: this.zipCode,
+          subdistrict: this.subDistrict,
           district: this.district,
           province: this.province,
-          allowMail: this.allowMail
+          address_allow: this.allowMail
         })
         this.$buefy.dialog.alert({
           title: 'บันทึกข้อมูลเรียบร้อย',
