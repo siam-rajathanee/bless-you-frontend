@@ -157,7 +157,7 @@ export default {
   },
   watch: {
     file (file) {
-      this.preview = file ? URL.createObjectURL(file) : null
+      this.preview = URL.createObjectURL(file)
     },
     zipCode () {
       if (this.zipCode.length === 5) {
@@ -182,7 +182,7 @@ export default {
           subdistrict: this.subDistrict,
           district: this.district,
           province: this.province,
-          address_allow: this.allowMail ? 1 : 0
+          address_allow: this.allowMail
         })
         this.$buefy.dialog.alert({
           title: 'บันทึกข้อมูลเรียบร้อย',
@@ -213,7 +213,6 @@ export default {
       this.address = null
       this.allowMail = false
       this.unsetAddress()
-      this.$refs.observer.reset()
     },
     unsetAddress () {
       this.subDistrict = null

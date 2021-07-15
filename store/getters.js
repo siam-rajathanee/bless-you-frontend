@@ -1,3 +1,4 @@
 export default {
-  donations: ({ donations }) => donations
+  donations: ({ donations }) => donations,
+  donation: ({ donation }) => donation
 }

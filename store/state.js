@@ -1,3 +1,4 @@
 export default () => ({
-  donations: null
+  donations: null,
+  donation: null
 })
