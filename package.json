@@ -17,7 +17,8 @@
     "core-js": "^3.15.1",
     "nuxt": "^2.15.7",
     "nuxt-buefy": "^0.4.8",
-    "thai-data": "^1.0.9"
+    "thai-data": "^1.0.9",
+    "vee-validate": "^3.4.10"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.14.7",
