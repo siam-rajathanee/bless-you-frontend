@@ -1,4 +1,16 @@
 export default {
+
+  publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.BASE_URL
+    }
+  },
+
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL
+    }
+  },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'อนุโมทนา สาธุ',
@@ -38,11 +50,53 @@ export default {
     // https://go.nuxtjs.dev/buefy
     'nuxt-buefy',
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    // https://auth.nuxtjs.org
+    '@nuxtjs/auth-next',
+    '@nuxtjs/dayjs'
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {},
+
+  router: {
+    middleware: ['auth']
+  },
+
+  dayjs: {
+    locales: ['th'],
+    defaultLocale: 'th',
+    defaultTimeZone: 'Asia/Bangkok',
+    plugins: ['utc', 'timezone']
+  },
+
+  auth: {
+    redirect: {
+      login: '/warden/login',
+      logout: '/warden/',
+      callback: '/warden/login',
+      home: '/warden/'
+    },
+    strategies: {
+      laravelJWT: {
+        providor: 'laravel/jwt',
+        url: process.env.BASE_URL,
+        endpoints: {
+          login: { url: '/auth/login', method: 'post' },
+          refresh: { url: '/auth/refresh', method: 'post' },
+          user: { url: '/auth/user-profile', method: 'get' },
+          logout: { url: '/auth/logout', method: 'post' }
+        },
+        token: {
+          property: 'access_token',
+          maxAge: 60 * 60
+        },
+        refreshToken: {
+          maxAge: 20160 * 60
+        }
+      }
+    }
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {

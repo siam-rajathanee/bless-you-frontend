@@ -78,6 +78,7 @@ import Thai from 'thai-data'
 
 export default {
   name: 'HomePage',
+  auth: false,
   data () {
     return {
       file: null,
