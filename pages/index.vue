@@ -126,19 +126,8 @@
 
 <script>
 import Thai from 'thai-data'
-import { extend, ValidationObserver, ValidationProvider } from 'vee-validate'
+import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import { mapActions } from 'vuex'
-import { required, numeric } from 'vee-validate/dist/rules'
-
-extend('required', {
-  ...required,
-  message: 'กรุณากรอกข้อมูลให้ครบถ้วน'
-})
-
-extend('numeric', {
-  ...numeric,
-  message: 'กรุณากรอกตัวเลขเท่านั้น'
-})
 
 export default {
   name: 'HomePage',
