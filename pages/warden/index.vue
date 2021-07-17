@@ -92,11 +92,14 @@
         {{ $dayjs(row.created_at).format('DD MMM YYYY HH:mm') }}
       </b-table-column>
       <b-table-column v-slot="{ row }">
-        <b-button type="is-info" :to="{ name: 'warden-id', params: { id: row.id } }">
-          รายละเอียด
-        </b-button>
+        <NuxtLink :to="`/warden/${row.id}`">
+          <b-button type="is-info">
+            รายละเอียด
+          </b-button>
+        </NuxtLink>
       </b-table-column>
     </b-table>
+    <NuxtChild />
   </section>
 </template>
 
