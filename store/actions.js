@@ -1,4 +1,4 @@
-import { SET_DONATIONS, SET_DONATION_DETAILS } from './mutations'
+import { SET_DONATIONS, SET_DONATION_DETAIL } from './mutations'
 
 export default {
   createDonation (_, data) {
@@ -21,7 +21,7 @@ export default {
   },
   async getDonationsById ({ commit }, { id } = {}) {
     const { data } = await this.$axios.get(`donations/${id}`)
-    commit(SET_DONATION_DETAILS, data)
+    commit(SET_DONATION_DETAIL, data)
     return Promise.resolve(data)
   }
 }
