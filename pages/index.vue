@@ -127,7 +127,7 @@
 <script>
 import Thai from 'thai-data'
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'HomePage',
@@ -141,7 +141,7 @@ export default {
       file: null,
       firstname: null,
       lastname: null,
-      donate: 'โลงศพ',
+      donate: null,
       donateOther: null,
       address: null,
       amount: null,
@@ -151,9 +151,11 @@ export default {
       province: null,
       allowMail: false,
       subDistricts: [],
-      donationTypes: ['โลงศพ', 'ค่าน้ำ / ค่าไฟ'],
       preview: null
     }
+  },
+  computed: {
+    ...mapGetters(['donationTypes'])
   },
   watch: {
     file (file) {
@@ -210,6 +212,7 @@ export default {
       this.lastname = null
       this.donate = null
       this.donateOther = null
+      this.amount = null
       this.address = null
       this.allowMail = false
       this.unsetAddress()

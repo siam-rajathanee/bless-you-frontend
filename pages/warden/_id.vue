@@ -1,25 +1,61 @@
 <template>
-  <section class="section" v-if="donation !== null">
-    <h1 class="title has-text-centered">
-      ข้อมูลการร่วมบริจาค
-    </h1>
-    <p class="subtitle has-text-centered my-5">
-      รายละเอียดของคุณ {{ fullname }}
-    </p>
-    <div class="has-text-centered my-5">
-      <NuxtLink to="./" >
-        กลับหน้าหลัก
-      </NuxtLink >
+  <section v-if="donation !== null" class="section">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <div>
+            <p class="heading">
+              ข้อมูลการร่วมบริจาค
+            </p>
+            <p class="title">
+              คุณ {{ fullname }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <NuxtLink :to="{ name: 'warden' }">
+            กลับหน้าหลัก
+          </NuxtLink>
+        </div>
+      </div>
     </div>
     <div class="columns is-mobile">
-      <div class="column is-half-desktop">
-        <h2 class="mb-3">
-          <b>หลักฐานการโอนเงิน</b>
-        </h2>
-        <img :src="donation.proof_of_transfer">
+      <div class="column">
+        <b-collapse class="card" :open="!donation.blessing_card">
+          <template #trigger="{ open }">
+            <div class="card-header">
+              <p class="card-header-title">
+                หลักฐานการโอนเงิน
+              </p>
+              <a class="card-header-icon">
+                <b-icon :icon="open ? 'menu-down' : 'menu-up'" />
+              </a>
+            </div>
+          </template>
+          <div class="card-image">
+            <img :src="donation.proof_of_transfer">
+          </div>
+        </b-collapse>
+        <b-collapse v-if="donation.blessing_card" class="card mt-3">
+          <template #trigger="{ open }">
+            <div class="card-header">
+              <p class="card-header-title">
+                ใบอนุโมทนาบัตร
+              </p>
+              <a class="card-header-icon">
+                <b-icon :icon="open ? 'menu-down' : 'menu-up'" />
+              </a>
+            </div>
+          </template>
+          <div class="card-image">
+            <img :src="donation.blessing_card.card">
+          </div>
+        </b-collapse>
       </div>
-      <div class="column ">
-        <ValidationObserver ref="observer" v-slot="{ handleSubmit }">
+      <div class="column">
+        <ValidationObserver ref="observer" v-slot="{ handleSubmit, dirty }">
           <ValidationProvider
             v-slot="{ errors, valid }"
             rules="required"
@@ -82,34 +118,6 @@
               :message="errors"
             >
               <b-input v-model="donateOther" />
-            </b-field>
-          </ValidationProvider>
-          <ValidationProvider
-            v-slot="{ errors, valid }"
-            rules="required"
-            name="หลักฐานการโอนเงิน"
-          >
-            <b-field
-              label="หลักฐานการโอนเงิน"
-              :type="{ 'is-danger': errors[0], 'is-success': valid }"
-              :message="errors"
-            >
-              <b-upload
-                v-model="file"
-                drag-drop
-                expanded
-                class="background-upload-preview"
-                :style="preview ? `background-image: url(${preview});` : ''"
-              >
-                <section class="section">
-                  <div class="content has-text-centered">
-                    <p>
-                      <b-icon icon="upload" size="is-large" />
-                    </p>
-                    <p>คลิกเพื่ออัปโหลดหลักฐานการโอนเงิน หรือลากไฟล์ใส่ได้เลย</p>
-                  </div>
-                </section>
-              </b-upload>
             </b-field>
           </ValidationProvider>
           <ValidationProvider
@@ -217,19 +225,30 @@
             </ValidationProvider>
           </template>
           <b-field class="mt-3">
-            <b-button type="is-warning" @click="handleSubmit(onSubmit)">
-              บันทึกการแก้ไข
-            </b-button>
-            <b-button type="is-success mx-2" @click="handleSubmit(onSubmit)">
-              อนุมัติใบอนุโมทนาบุญ
-            </b-button>
-            <b-button type="is-default" @click="handleSubmit(onSubmit)">
-              พิมพ์ใบอนุโมทนาบุญ
-            </b-button>
+            <div class="buttons">
+              <b-button type="is-info" :disabled="!dirty" @click="handleSubmit(onSubmit)">
+                บันทึกการแก้ไข
+              </b-button>
+              <b-button type="is-default" :disabled="!dirty" @click="handleSubmit(onSubmit)">
+                ยกเลิกการแก้ไข
+              </b-button>
+            </div>
           </b-field>
+          <div class="buttons mt-3">
+            <template v-if="!donation.status">
+              <b-button type="is-success" :disabled="dirty" @click="approve">
+                อนุมัติ
+              </b-button>
+              <b-button type="is-danger" :disabled="dirty" @click="reject">
+                ปฏิเสธ
+              </b-button>
+            </template>
+            <b-button v-else type="is-success" :disabled="dirty" @click="print">
+              พิมพ์ใบอนุโมทนาบัตร
+            </b-button>
+          </div>
         </ValidationObserver>
       </div>
-
     </div>
   </section>
 </template>
@@ -249,7 +268,7 @@ export default {
       file: null,
       firstname: null,
       lastname: null,
-      donate: 'โลงศพ',
+      donate: null,
       donateOther: null,
       address: null,
       amount: null,
@@ -259,29 +278,11 @@ export default {
       province: null,
       allowMail: false,
       subDistricts: [],
-      donationTypes: ['โลงศพ', 'ค่าน้ำ / ค่าไฟ'],
       preview: null
     }
   },
-  async fetch () {
-    await this.getDonationsById({
-      id: this.$route.params.id
-    })
-
-    this.firstname = this.donation.firstname
-    this.lastname = this.donation.lastname
-    this.donate = this.donation.donate
-    this.amount = parseFloat(this.donation.amount)
-
-    if (this.donation.address !== null) {
-      this.allowMail = true
-      this.address = this.donation.address.address
-      this.zipCode = this.donation.address.zip_code
-      this.autoSuggestion(this.donation.address.subdistrict, this.donation.address.district)
-    }
-  },
   computed: {
-    ...mapGetters(['donation']),
+    ...mapGetters(['donation', 'donationTypes']),
     fullname () {
       const { firstname, lastname } = this.donation
       return `${firstname} ${lastname}`
@@ -299,26 +300,61 @@ export default {
       }
     }
   },
+  async mounted () {
+    await this.getDonationById(this.$route.params.id)
+    this.resetForm()
+  },
   methods: {
-    ...mapActions(['getDonationsById']),
+    ...mapActions(['getDonationById', 'updateDonation']),
     async onSubmit () {
+      await this.updateDonation({
+        id: this.donation.id,
+        body: {
+          firstname: this.firstname,
+          lastname: this.lastname,
+          donate: this.donate,
+          donateOther: this.donateOther,
+          address: this.address,
+          amount: this.amount,
+          zipCode: this.zipCode,
+          subDistrict: this.subDistrict,
+          district: this.district,
+          province: this.province,
+          allowMail: this.allowMail
+        }
+      })
+    },
+    approve () {
+      this.updateDonation({
+        id: this.donation.id,
+        body: {
+          status: 'approved'
+        }
+      })
+    },
+    reject () {
+      this.updateDonation({
+        id: this.donation.id,
+        body: {
+          status: 'rejected'
+        }
+      })
+    },
+    print () {
 
     },
-    clearForm () {
-      this.file = null
-      this.firstname = null
-      this.lastname = null
-      this.donate = null
-      this.donateOther = null
-      this.address = null
-      this.allowMail = false
-      this.unsetAddress()
-    },
-    unsetAddress () {
-      this.subDistrict = null
-      this.district = null
-      this.province = null
-      this.subDistricts = []
+    resetForm () {
+      this.firstname = this.donation.firstname
+      this.lastname = this.donation.lastname
+      this.donate = this.donation.donate
+      this.amount = parseFloat(this.donation.amount)
+
+      if (this.donation.address !== null) {
+        this.allowMail = true
+        this.address = this.donation.address.address
+        this.zipCode = this.donation.address.zip_code
+        this.autoSuggestion(this.donation.address.subdistrict, this.donation.address.district)
+      }
     },
     autoSuggestion (inputSubdistrict = null, inputDistrict = null) {
       const { subDistrict, districtName, provinceName } = Thai.autoSuggestion(this.zipCode, this.subDistrict)
@@ -334,6 +370,12 @@ export default {
         this.district = inputDistrict
         this.subDistrict = inputSubdistrict
       }
+    },
+    unsetAddress () {
+      this.subDistrict = null
+      this.district = null
+      this.province = null
+      this.subDistricts = []
     }
   }
 }

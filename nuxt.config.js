@@ -1,14 +1,17 @@
 export default {
+  server: {
+    port: 8080
+  },
 
   publicRuntimeConfig: {
     axios: {
-      browserBaseURL: process.env.BASE_URL
+      browserBaseURL: process.env.API_URL
     }
   },
 
   privateRuntimeConfig: {
     axios: {
-      baseURL: process.env.BASE_URL
+      baseURL: process.env.API_URL
     }
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -61,6 +64,7 @@ export default {
   axios: {},
 
   router: {
+    base: process.env.BASE_URL || '/',
     middleware: ['auth']
   },
 
@@ -81,7 +85,7 @@ export default {
     strategies: {
       laravelJWT: {
         providor: 'laravel/jwt',
-        url: process.env.BASE_URL,
+        url: process.env.API_URL,
         endpoints: {
           login: { url: '/auth/login', method: 'post' },
           refresh: { url: '/auth/refresh', method: 'post' },
